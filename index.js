@@ -1,6 +1,7 @@
 const {spawn} = require('child_process');
 const { json } = require('express');
 const pyproc = spawn('python', ["recorder.py"])
+const axios = require('axios').default;
 
 function jsonData(birdArray)
 {
@@ -19,6 +20,17 @@ function jsonData(birdArray)
 
     myObj.birdnet = listOfObjects;
     console.log(myObj);
+
+    axios.post("https://tst-gravitee-gateway.dataplatform.nl/lab/1.0/faunatoren", myObj, 
+    {
+        headers: {
+            'Content-Type' : 'application/json',
+            'X-Gravitee-Api-Key': '24e0586f-175d-44b5-8fa5-24579736497b'
+        }
+    }
+).then((response) => {
+    console.log(response);
+})
 }
 
 pyproc.stdout.on('data', (data) => {
