@@ -1,0 +1,21 @@
+{
+    "timestamp": 1622799067,
+    "id": "Testcrunch",
+    "tripwire": true,
+    "activity": 3.1400001,
+    "lichtwaarde": 255,
+    "birdnet": [
+        {
+            "merel": 0.15
+        },
+        {
+            "spreeuw": 0.35
+        },
+        {
+            "koolmees": 0.65
+        },
+        {
+            "zwartkop": 0.46
+        }
+    ]
+}
