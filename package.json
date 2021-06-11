@@ -12,6 +12,7 @@
     "axios": "^0.21.1",
     "child_process": "^1.0.2",
     "express": "^4.17.1",
+    "serialport": "^9.1.0",
     "util": "^0.12.4"
   }
 }

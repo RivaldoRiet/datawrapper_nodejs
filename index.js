@@ -3,34 +3,80 @@ const { json } = require('express');
 const pyproc = spawn('python', ["recorder.py"])
 const axios = require('axios').default;
 
-function jsonData(birdArray)
-{
-    myObj = new Object()
-    myObj.timestamp = Math.floor(+new Date() / 1000);
-    myObj.id = "nodejs";
-    myObj.tripwire = true;
-    myObj.activity = 3.1400001;
-    myObj.lichtwaarde = 255;
-    var listOfObjects = [];
-    for(var i = 0; i < birdArray.length; i++) {
-        val = new Object()
-        val[birdArray[i].split(";")[0]] = birdArray[i].split(";")[1];
-        listOfObjects.push(val);
-    }
+const SerialPort = require('serialport');
+const ReadLine = require('@serialport/parser-readline');
 
-    myObj.birdnet = listOfObjects;
-    console.log(myObj);
+const port = new SerialPort('COM6'); // open Serial Port
+const parser = port.pipe(new ReadLine({ delimiter: '\r\n' })) //Open Serial stream delimited by \r\n
 
-    axios.post("https://tst-gravitee-gateway.dataplatform.nl/lab/1.0/faunatoren", myObj, 
+const towerURN = "urn:test.faunatoren.test.hok.test1";
+
+var sensorInit = true; //is sensor Initialising
+
+var sensorTypes; //Array of sensortypes
+var sensorBuff; //Sensor data Buffer
+
+var birdBuff;
+
+setInterval(sendSensorData, 1000) //Set Sending interval Every Second
+
+
+
+parser.on('data', function (data) {
+    
+    var sensordata = new Object(); 
+    //console.log(data)
+    if (data.includes(",")){
+        dataArray = data.split(",")
+        if (sensorInit)
+        {
+            sensorInit = false;
+            sensorTypes = dataArray; // Define Sensortypes 
+            return;
+        }
+        //Write Data to respective key
+        sensorTypes.forEach((element, index) => {
+            sensordata[element] = dataArray[index];
+        });
+
+        //console.log(sensordata)
+        sensorBuff = sensordata; //Wrire data to Buffer
+    }   
+  });
+
+function sendSensorData(){
+
+    var metadata = new Object();
+
+    metadata.timestamp = Math.floor(+new Date() / 1000); //get Time
+    metadata.id = towerURN; // Set URN
+
+    var buffer = {...metadata ,...sensorBuff, ...birdBuff}// Combine DataBuffers 
+    axios.post("https://tst-gravitee-gateway.dataplatform.nl/lab/1.0/faunatoren", buffer, 
     {
         headers: {
             'Content-Type' : 'application/json',
             'X-Gravitee-Api-Key': '24e0586f-175d-44b5-8fa5-24579736497b'
         }
     }
-).then((response) => {
-    console.log(response);
-})
+    ).then((response) => {
+        console.log(response);
+    });
+}
+
+function jsonData(birdArray)
+{
+    myObj = new Object() //Instantiate object
+    var listOfObjects = [];
+    for(var i = 0; i < birdArray.length; i++) {
+        val = new Object()
+        val[birdArray[i].split(";")[0]] = birdArray[i].split(";")[1];
+        listOfObjects.push(val);
+    }
+    myObj.birdnet = listOfObjects;
+    birdBuff = myObj;
+
+    
 }
 
 pyproc.stdout.on('data', (data) => {
@@ -52,7 +98,6 @@ pyproc.stdout.on('data', (data) => {
         console.log(data.toString());
     }
 })
-
 
 function IsJsonString(str) {
     try {
