@@ -1,3 +1,5 @@
+const config = require('./config.json')
+
 const {spawn} = require('child_process');
 const { json } = require('express');
 const pyproc = spawn('python', ["recorder.py"])
@@ -6,10 +8,10 @@ const axios = require('axios').default;
 const SerialPort = require('serialport');
 const ReadLine = require('@serialport/parser-readline');
 
-const port = new SerialPort('COM6'); // open Serial Port
+const port = new SerialPort(config.port); // open Serial Port
 const parser = port.pipe(new ReadLine({ delimiter: '\r\n' })) //Open Serial stream delimited by \r\n
 
-const towerURN = "urn:test.faunatoren.test.hok.test1";
+const towerURN = config.urn;
 
 var sensorInit = true; //is sensor Initialising
 
@@ -52,11 +54,12 @@ function sendSensorData(){
     metadata.id = towerURN; // Set URN
 
     var buffer = {...metadata ,...sensorBuff, ...birdBuff}// Combine DataBuffers 
+    console.log(buffer);
     axios.post("https://tst-gravitee-gateway.dataplatform.nl/lab/1.0/faunatoren", buffer, 
     {
         headers: {
             'Content-Type' : 'application/json',
-            'X-Gravitee-Api-Key': '24e0586f-175d-44b5-8fa5-24579736497b'
+            'X-Gravitee-Api-Key': config.APIKey
         }
     }
     ).then((response) => {
