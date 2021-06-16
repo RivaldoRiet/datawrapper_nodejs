@@ -38,7 +38,12 @@ parser.on('data', function (data) {
         }
         //Write Data to respective key
         sensorTypes.forEach((element, index) => {
-            sensordata[element] = dataArray[index];
+            if (element === "tripwire"){
+                sensordata[element] = parseFloat(dataArray[index]) == 1 ? true : false
+            } else {
+                
+                sensordata[element] = parseFloat(dataArray[index]);
+            }
         });
 
         //console.log(sensordata)
@@ -54,7 +59,7 @@ function sendSensorData(){
     metadata.id = towerURN; // Set URN
 
     var buffer = {...metadata ,...sensorBuff, ...birdBuff}// Combine DataBuffers 
-    console.log(buffer);
+    console.log(JSON.stringify(buffer));
     axios.post("https://tst-gravitee-gateway.dataplatform.nl/lab/1.0/faunatoren", buffer, 
     {
         headers: {
@@ -73,7 +78,7 @@ function jsonData(birdArray)
     var listOfObjects = [];
     for(var i = 0; i < birdArray.length; i++) {
         val = new Object()
-        val[birdArray[i].split(";")[0]] = birdArray[i].split(";")[1];
+        val[birdArray[i].split(";")[0]] = parseFloat(birdArray[i].split(";")[1]);
         listOfObjects.push(val);
     }
     myObj.birdnet = listOfObjects;
