@@ -9,10 +9,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "audiobuffer-to-wav": "^1.0.0",
     "axios": "^0.21.1",
     "child_process": "^1.0.2",
     "express": "^4.17.1",
+    "form-data": "^4.0.0",
+    "memory-fs": "^0.5.0",
+    "mic": "^2.1.2",
+    "node-microphone": "^0.1.5",
+    "request": "^2.88.2",
     "serialport": "^9.1.0",
-    "util": "^0.12.4"
+    "stream": "0.0.2",
+    "util": "^0.12.4",
+    "wav": "^1.0.2"
   }
 }
