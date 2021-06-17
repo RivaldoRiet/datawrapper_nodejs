@@ -1,5 +1,5 @@
 {
-    "port":"/dev/ttyAMA0",
-    "urn":"urn:test.faunatoren.test.hok.testpi",
+    "port":"COM5",
+    "urn":"testt",
     "APIKey":"24e0586f-175d-44b5-8fa5-24579736497b"
 }
